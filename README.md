@@ -1,42 +1,56 @@
-# AI-Powered Multi-Agent Support System (Next.js Version)
+# Nexus Support: AI Multi-Agent Dashboard
 
-A clean, full-stack support system built using **Next.js**. It features intelligent message routing, context management, and a premium AI-driven interface.
+Welcome to **Nexus Support**, a production-ready multi-agent support ecosystem. Nexus uses a sophisticated three-agent chain to handle customer requests with human-like precision.
 
-## 🚀 Features
+## 🧠 The Multi-Agent Architecture
 
-- **Multi-Agent Routing**: Your query is automatically sent to the best specialist (Tech, Billing, or Support).
-- **Context Compaction**: Automatically summarizes long chats to save space and stay fast.
-- **Thinking Indicators**: Real-time visual feedback showing exactly what the AI is doing ("Routing", "Analyzing").
-- **Full-stack Simplicity**: No complex monorepo or extra backend servers—just pure Next.js.
-- **Rate Limiting**: Protection against too many requests.
-- **Durable Flows**: Designed to handle complex, multi-step AI tasks.
+Nexus uses a pipeline of specialized LLM agents orchestrated via **LangChain** and **Gemini AI**:
 
-## 🛠️ How it Works
+1.  **Agent A (The Classifier)**: Analyzes the ticket to determine its category (Technical, Billing, or General) and detects customer sentiment (Angry, Neutral, or Happy).
+2.  **Agent B (The Researcher)**: Cross-references the category against an internal Knowledge Base (`knowledge_base.json`) to find the exact company policy or technical resolution.
+3.  **Agent C (The Composer)**: Synthesizes the original query, the detected sentiment, and the research findings to draft a professional, empathetic response.
 
-### 1. The Router
-Every message you send is analyzed by a "Router" in `src/lib/router.ts`. It looks for keywords like "code", "bill", or "help" to decide which specialist agent should answer.
+## 🛠️ Tech Stack
 
-### 2. Context Management
-To keep the AI sharp, we don't send the entire chat history every time. The "Compaction" logic pruning old messages and keeps recent ones, ensuring the AI always has the most relevant info without being overwhelmed.
+- **Frontend**: Next.js 15+, Tailwind CSS, Framer Motion, Lucide React.
+- **Backend**: Next.js API Routes, LangChain, Google Gemini Pro.
+- **Database**: MongoDB (via Mongoose) for persistent ticket storage and "Agent Thought Logging."
 
-### 3. API Routes
-Backend logic is handled in Next.js API routes (`src/app/api/chat/route.ts`), which acts as the central hub for the multi-agent system.
+## 🚀 Setup Instructions
 
-## 📦 Getting Started
+1.  **Clone & Install**:
+    ```bash
+    npm install
+    ```
 
-1. **Install everything**:
-   ```bash
-   npm install
-   ```
+2.  **Environment Variables**:
+    Create a `.env` file based on `.env.example`:
+    ```env
+    # Required for AI logic
+    GEMINI_API_KEY=your_key_here
+    
+    # Required for persistence
+    MONGODB_URI=mongodb://localhost:27017/nexus_support
+    ```
 
-2. **Run the app**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) to start chatting.
+3.  **Seed Fresh Data (Optional)**:
+    Start the app and visit `http://localhost:3000/api/seed` to populate your dashboard with mock tickets.
 
-## 🧪 Project Structure
+4.  **Run Development Server**:
+    ```bash
+    npm run dev
+    ```
 
-- `src/app/api`: Backend logic and agent routing.
-- `src/components`: The premium chat interface.
-- `src/lib`: Core logic for routing and context management.
+## 📂 Project Structure
+
+- `src/app/dashboard`: The Admin Command Center.
+- `src/app/ticket/new`: Public customer submission portal.
+- `src/lib/agents.ts`: The core "Thought Logic" for the MAS workflow.
+- `src/models/Ticket.ts`: Robust schema for tickets and agent logs.
+
+## 🧪 Production Readiness Features
+
+- **Agent Thought Trace**: Every decision is logged and visible in the admin panel.
+- **Sentiment-Aware Drafting**: Responses adapt to the customer's mood.
+- **Safe Editing**: Admins can review and refine AI drafts before sending.
+- **Scalable Backend**: Designed to handle growing ticket volumes with durable state.

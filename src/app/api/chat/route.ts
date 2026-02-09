@@ -2,21 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChatRequestSchema, Message } from '@/lib/types';
 import { routeMessage, compactContext } from '@/lib/router';
 
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000;
-const MAX_REQUESTS = 10;
+import { rateLimit } from '@/lib/rate-limit';
 
-function checkRateLimit(ip: string) {
-    const now = Date.now();
-    const record = rateLimitMap.get(ip) || { count: 0, lastReset: now };
-    if (now - record.lastReset > RATE_LIMIT_WINDOW) {
-        record.count = 0; record.lastReset = now;
-    }
-    if (record.count >= MAX_REQUESTS) return false;
-    record.count++;
-    rateLimitMap.set(ip, record);
-    return true;
-}
+const RATE_LIMIT_CONFIG = {
+    windowMs: 60 * 1000,
+    max: 10
+};
 
 /**
  * MAS Orchestration Logic:
@@ -26,8 +17,9 @@ function checkRateLimit(ip: string) {
  * 4. QC Agent: Final validation.
  */
 export async function POST(req: NextRequest) {
-    const ip = req.ip || 'local';
-    if (!checkRateLimit(ip)) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
+    const { success } = rateLimit(ip, RATE_LIMIT_CONFIG);
+    if (!success) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
 
     try {
         const body = await req.json();
