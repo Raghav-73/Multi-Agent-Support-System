@@ -1,56 +1,198 @@
-# Nexus Support: AI Multi-Agent Dashboard
+# Multi-Agent Support System
 
-Welcome to **Nexus Support**, a production-ready multi-agent support ecosystem. Nexus uses a sophisticated three-agent chain to handle customer requests with human-like precision.
+An AI-powered customer support system with a multi-agent architecture built with React, Hono, Prisma, and the Vercel AI SDK.
 
-## 🧠 The Multi-Agent Architecture
+## 🏗️ Architecture
 
-Nexus uses a pipeline of specialized LLM agents orchestrated via **LangChain** and **Gemini AI**:
+### Multi-Agent System
+- **Router Agent**: Analyzes incoming queries and delegates to specialized sub-agents
+- **Support Agent**: Handles general inquiries, FAQs, and troubleshooting
+- **Order Agent**: Manages order status, tracking, and modifications
+- **Billing Agent**: Handles payments, invoices, and refunds
 
-1.  **Agent A (The Classifier)**: Analyzes the ticket to determine its category (Technical, Billing, or General) and detects customer sentiment (Angry, Neutral, or Happy).
-2.  **Agent B (The Researcher)**: Cross-references the category against an internal Knowledge Base (`knowledge_base.json`) to find the exact company policy or technical resolution.
-3.  **Agent C (The Composer)**: Synthesizes the original query, the detected sentiment, and the research findings to draft a professional, empathetic response.
-
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js 15+, Tailwind CSS, Framer Motion, Lucide React.
-- **Backend**: Next.js API Routes, LangChain, Google Gemini Pro.
-- **Database**: MongoDB (via Mongoose) for persistent ticket storage and "Agent Thought Logging."
+### Tech Stack
+- **Frontend**: React + Vite + Vercel AI SDK
+- **Backend**: Hono.dev (Node.js)
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **AI**: Vercel AI SDK with Google Gemini 2.5 Flash
 
 ## 🚀 Setup Instructions
 
-1.  **Clone & Install**:
-    ```bash
-    npm install
-    ```
+### Prerequisites
+- Node.js 18+ installed
+- Docker and Docker Compose installed
+- Google AI API Key ([Get one here](https://aistudio.google.com/app/apikey))
 
-2.  **Environment Variables**:
-    Create a `.env` file based on `.env.example`:
-    ```env
-    # Required for AI logic
-    GEMINI_API_KEY=your_key_here
-    
-    # Required for persistence
-    MONGODB_URI=mongodb://localhost:27017/nexus_support
-    ```
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd Multi-Agent-Support-System
+```
 
-3.  **Seed Fresh Data (Optional)**:
-    Start the app and visit `http://localhost:3000/api/seed` to populate your dashboard with mock tickets.
+### 2. Start PostgreSQL Database
+```bash
+docker-compose up -d
+```
 
-4.  **Run Development Server**:
-    ```bash
-    npm run dev
-    ```
+This will start a PostgreSQL instance on `localhost:5432`.
 
-## 📂 Project Structure
+### 3. Backend Setup
+```bash
+cd backend
 
-- `src/app/dashboard`: The Admin Command Center.
-- `src/app/ticket/new`: Public customer submission portal.
-- `src/lib/agents.ts`: The core "Thought Logic" for the MAS workflow.
-- `src/models/Ticket.ts`: Robust schema for tickets and agent logs.
+# Install dependencies
+npm install
 
-## 🧪 Production Readiness Features
+# Configure environment variables
+# Create a .env file with:
+# PORT=3000
+# DATABASE_URL="postgresql://postgres:password@localhost:5432/multi_agent_db?schema=public"
+# GOOGLE_GENERATIVE_AI_API_KEY="your-api-key-here"
 
-- **Agent Thought Trace**: Every decision is logged and visible in the admin panel.
-- **Sentiment-Aware Drafting**: Responses adapt to the customer's mood.
-- **Safe Editing**: Admins can review and refine AI drafts before sending.
-- **Scalable Backend**: Designed to handle growing ticket volumes with durable state.
+# Generate Prisma Client
+npm run db:generate
+
+# Push schema to database
+npm run db:push
+
+# Seed the database with sample data
+npm run db:seed
+```
+
+### 4. Frontend Setup
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install
+```
+
+### 5. Run the Application
+From the root directory:
+```bash
+npm run dev
+```
+
+This will start:
+- Backend API on `http://localhost:3000`
+- Frontend on `http://localhost:5173`
+
+## 📡 API Endpoints
+
+### Chat
+- `POST /api/chat` - Send a new message
+- `GET /api/chat/conversations` - List all conversations
+- `GET /api/chat/conversations/:id` - Get conversation history
+- `DELETE /api/chat/conversations/:id` - Delete a conversation
+
+### Agents
+- `GET /api/agents` - List available agents
+- `GET /api/agents/:type/capabilities` - Get agent capabilities
+
+### Health
+- `GET /health` - Health check endpoint
+
+## 🛠️ Agent Tools
+
+### Support Agent
+- `getConversationHistory`: Query conversation history
+
+### Order Agent
+- `getOrderDetails`: Fetch order details by ID
+- `getDeliveryStatus`: Check delivery status and tracking
+
+### Billing Agent
+- `getInvoiceDetails`: Get invoice details for an order
+- `getRefundStatus`: Check refund status for payments
+
+## 📊 Database Schema
+
+The system uses PostgreSQL with the following models:
+- **Conversation**: Stores chat conversations
+- **Message**: Individual messages with agent type tracking
+- **Order**: Sample order data for testing
+- **Invoice**: Invoice records linked to orders
+- **Payment**: Payment and refund records
+
+## 🎯 Features
+
+- ✅ Multi-agent routing with intent classification
+- ✅ Streaming AI responses
+- ✅ Conversation persistence
+- ✅ Tool calling for data retrieval
+- ✅ Context-aware responses
+- ✅ Controller-Service pattern
+- ✅ Error handling middleware
+- ✅ Clean separation of concerns
+
+## 🧪 Testing Sample Queries
+
+Try these queries to test different agents:
+
+**Support Agent:**
+- "How do I reset my password?"
+- "What are your business hours?"
+
+**Order Agent:**
+- "What's the status of order ORD-101?"
+- "Track my order ORD-102"
+
+**Billing Agent:**
+- "Show me the invoice for order ORD-101"
+- "Check refund status for invoice INV-201"
+
+## 📝 Project Structure
+
+```
+Multi-Agent-Support-System/
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   ├── tools/
+│   │   ├── middleware/
+│   │   └── lib/
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx
+│   │   └── index.css
+│   └── package.json
+├── docker-compose.yml
+└── README.md
+```
+
+## 🔧 Development
+
+### Database Commands
+```bash
+# Generate Prisma Client
+npm run db:generate
+
+# Push schema changes
+npm run db:push
+
+# Seed database
+npm run db:seed
+
+# Full setup
+npm run db:setup
+```
+
+### Stop PostgreSQL
+```bash
+docker-compose down
+```
+
+## 📄 License
+
+MIT
+
+## 👨‍💻 Author
+
+Built as part of a Fullstack Engineering Assessment
