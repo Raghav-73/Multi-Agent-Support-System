@@ -131,7 +131,7 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/health`);
       const data = await res.json();
-      if (data.success) {
+      if (data.status == "ok") {
         console.log("Health Check:", data);
       } else {
         alert(
