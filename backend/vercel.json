@@ -1,0 +1,9 @@
+{
+    "name": "multi-agent-backend",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/api/index"
+        }
+    ]
+}

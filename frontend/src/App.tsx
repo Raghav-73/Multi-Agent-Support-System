@@ -27,12 +27,15 @@ interface Conversation {
   updatedAt: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, sendMessage, setMessages, status } = useChat({
+    api: `${API_BASE_URL}/api/chat`,
     onResponse: (response: any) => {
       const newId = response.headers.get("x-conversation-id");
 
@@ -98,7 +101,7 @@ export default function App() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch("/api/chat/conversations");
+      const res = await fetch(`${API_BASE_URL}/api/chat/conversations`);
       const data = await res.json();
       setConversations(data);
     } catch (e) {
@@ -108,7 +111,7 @@ export default function App() {
 
   const fetchMessages = async (id: string) => {
     try {
-      const res = await fetch(`/api/chat/conversations/${id}`);
+      const res = await fetch(`${API_BASE_URL}/api/chat/conversations/${id}`);
       const data = await res.json();
       setMessages(
         data.messages.map((m: any) => ({
@@ -126,7 +129,7 @@ export default function App() {
 
   const deleteConversation = async (id: string) => {
     try {
-      await fetch(`/api/chat/conversations/${id}`, { method: "DELETE" });
+      await fetch(`${API_BASE_URL}/api/chat/conversations/${id}`, { method: "DELETE" });
       if (currentId === id) setCurrentId(null);
       fetchConversations();
     } catch (e) {
@@ -252,7 +255,7 @@ export default function App() {
             <h2 style={{ fontSize: "1.125rem", fontWeight: 600 }}>
               {currentId
                 ? conversations.find((c) => c.id === currentId)?.title ||
-                  "Active Session"
+                "Active Session"
                 : "New Session"}
             </h2>
             <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
