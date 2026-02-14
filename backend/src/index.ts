@@ -22,11 +22,16 @@ app.use('*', cors({
 
 import seed from '../prisma/seed.js'
 
-// Health check
-app.get('/', (c) => (
-    c.text('Hello World'),
-    seed()
-))
+app.get('/', (c) => c.text('Multi-Agent API is running'))
+
+app.get('/seed', async (c) => {
+    try {
+        await seed()
+        return c.json({ message: 'Database seeded successfully' })
+    } catch (err: any) {
+        return c.json({ error: err.message }, 500)
+    }
+})
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 
