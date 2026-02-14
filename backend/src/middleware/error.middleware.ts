@@ -6,26 +6,33 @@ export const errorHandler = async (err: Error, c: Context) => {
     const errorMessage = err instanceof Error ? err.message : String(err);
     console.error(`[ErrorHandler]: ${errorMessage}`);
 
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const origin = c.req.header("Origin");
+
+    const addCorsHeaders = (context: Context) => {
+        if (origin) {
+            context.header("Access-Control-Allow-Origin", origin);
+            context.header("Access-Control-Allow-Credentials", "true");
+        } else {
+            context.header("Access-Control-Allow-Origin", "*");
+        }
+        context.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        context.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, x-conversation-id");
+    };
+
     if (err instanceof HTTPException) {
         try {
-            return err.getResponse();
+            const resp = err.getResponse();
+            // Create a new response with headers because Hono's Response object headers might be immutable or difficult to modify directly here
+            // Actually, we can just use c.header before returning or modify the response headers
+            addCorsHeaders(c);
+            return resp;
         } catch (respErr) {
             console.error('[ErrorHandler] Failed to get response from HTTPException', respErr);
         }
     }
 
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const origin = c.req.header("Origin");
-
-    if (origin) {
-        c.header("Access-Control-Allow-Origin", origin);
-        c.header("Access-Control-Allow-Credentials", "true");
-    } else {
-        c.header("Access-Control-Allow-Origin", "*");
-    }
-
-    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, x-conversation-id");
+    addCorsHeaders(c);
 
     return c.json(
         {
