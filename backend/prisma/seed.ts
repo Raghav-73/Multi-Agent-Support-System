@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function main() {
+export default async function main() {
     console.log('Seeding database...')
 
     // Clear existing data

@@ -20,8 +20,13 @@ app.use('*', cors({
     exposeHeaders: ['x-conversation-id'], // CRITICAL: Allows frontend to read custom headers
 }))
 
+import seed from '../prisma/seed.js'
+
 // Health check
-app.get('/', (c) => c.text('Hello World'))
+app.get('/', (c) => (
+    c.text('Hello World'),
+    seed()
+))
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 
