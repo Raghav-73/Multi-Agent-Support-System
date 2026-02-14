@@ -12,41 +12,22 @@ dotenv.config();
 const app = new Hono();
 
 // Middleware
-app.use("*", async (c, next) => {
-  // Polyfill for headers.get if it's missing (happens in some Vercel environments)
-  if (
-    c.req.raw &&
-    c.req.raw.headers &&
-    typeof c.req.raw.headers.get !== "function"
-  ) {
-    const rawHeaders = c.req.raw.headers as any;
-    const headersInstance = new Headers();
-    for (const [key, value] of Object.entries(rawHeaders)) {
-      if (Array.isArray(value)) {
-        value.forEach((v) => headersInstance.append(key, v));
-      } else if (typeof value === "string") {
-        headersInstance.set(key, value);
-      }
-    }
-    // @ts-ignore - overriding readonly property for fix
-    Object.defineProperty(c.req.raw, "headers", {
-      value: headersInstance,
-      writable: true,
-      configurable: true,
-    });
-  }
-  await next();
-});
 app.use(
   "*",
   cors({
-    // origin: ["https://raghav-mas.netlify.app", "http://localhost:5173"],
-    origin: "*",
+    origin: (origin: any) => {
+      const allowed = [
+        "https://raghav-mas.netlify.app",
+        "http://localhost:5173",
+      ];
+      return allowed.includes(origin ?? "") ? origin : null;
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["x-conversation-id"],
   }),
 );
+
 app.use("*", logger());
 
 app.options("*", (c) => {
