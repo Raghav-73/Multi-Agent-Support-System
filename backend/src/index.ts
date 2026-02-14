@@ -17,16 +17,10 @@ const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: (origin) => {
-      // For production, we want to allow the specific Netlify origin or reflect back
-      // Reflecting origin is generally safe if we trust the clients, but better for debugging
-      return origin || "*";
-    },
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "Accept", "x-conversation-id"],
+    allowHeaders: ["Content-Type", "Authorization", "Accept"],
     exposeHeaders: ["x-conversation-id"],
-    maxAge: 86400,
-    credentials: true,
   }),
 );
 
@@ -68,11 +62,6 @@ app.notFound((c) => {
 app.onError((err, c) => {
   console.error(`[Error ${c.req.method} ${c.req.path}]: ${err.message}`);
   return errorHandler(err, c);
-});
-
-// 7. Explicit OPTIONS handler as a fallback
-app.options("*", (c) => {
-  return c.body(null, 204);
 });
 
 const port = Number(process.env.PORT) || 3000;
