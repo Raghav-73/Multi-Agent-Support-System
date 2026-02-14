@@ -73,14 +73,13 @@ export default function App() {
       let assistantContent = "";
       const assistantId = Date.now().toString() + "-ai";
 
-      // Add placeholder for assistant message
       setMessages((prev) => [
         ...prev,
         {
           id: assistantId,
           role: "assistant",
           content: "",
-          agentType: "ROUTING", // Default or optimistic
+          agentType: "ROUTING",
         },
       ]);
 
