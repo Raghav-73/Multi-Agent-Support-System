@@ -20,7 +20,7 @@ export class AgentService {
       .join("\n");
 
     const { text: intent } = await generateText({
-      model: google("gemini-1.5-flash"),
+      model: google("gemini-2.0-flash"),
       system: `You are an intent classification agent. Categorize the user's message into one of these categories:
       - SUPPORT: General help, account issues, or basic platform questions.
       - ORDER_MANAGEMENT: Questions about specific orders, delivery, or order history.
