@@ -25,10 +25,6 @@ app.use(
 
 app.use("*", logger());
 
-app.options("*", (c) => {
-  return c.text("", 204 as any);
-});
-
 import seed from "../prisma/seed.js";
 
 app.get("/", (c) => c.text("Multi-Agent API is running"));
@@ -41,9 +37,6 @@ app.get("/seed", async (c) => {
     return c.json({ error: err.message }, 500);
   }
 });
-app.get("/health", (c) =>
-  c.json({ status: "ok", timestamp: new Date().toISOString() }),
-);
 app.get("/api/health", (c) =>
   c.json({ status: "ok", timestamp: new Date().toISOString() }),
 );
