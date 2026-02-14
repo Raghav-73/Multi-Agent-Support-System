@@ -7,9 +7,14 @@
         "dev:frontend": "npm --prefix frontend run dev",
         "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
         "install:all": "npm install --prefix backend && npm install --prefix frontend",
+        "build": "npm run install:all && npm run build --prefix backend && npm run build --prefix frontend",
         "db:setup": "npm --prefix backend run db:push && npm --prefix backend run db:seed"
     },
     "devDependencies": {
+        "@types/node": "^25.2.3",
         "concurrently": "^9.0.1"
+    },
+    "dependencies": {
+        "hono": "^4.11.9"
     }
 }

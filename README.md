@@ -189,6 +189,44 @@ npm run db:setup
 docker-compose down
 ```
 
+## 🚀 Deployment to Vercel
+
+This project is configured for a unified monorepo deployment on **Vercel**.
+
+### 1. Connect to Vercel
+- Push your code to a GitHub repository.
+- Go to the [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New" → "Project"**.
+- Import your repository.
+
+### 2. Configure Vercel Project
+- **Framework Preset**: Select **Vite** (or leave as Other).
+- **Root Directory**: Keep as `.` (root).
+- **Build Command**: `npm run build`
+- **Output Directory**: `frontend/dist`
+
+### 3. Set Up Vercel Postgres
+Instead of running PostgreSQL locally, use Vercel's managed database:
+1. In your project dashboard, click the **"Storage"** tab.
+2. Select **"Postgres"** and click **"Create"**.
+3. Click **"Connect"** to link it to your project.
+4. This will automatically add the `DATABASE_URL` (and other variables) to your environment.
+
+### 4. Required Environment Variables
+Go to **Settings → Environment Variables** and ensure these are set:
+- `DATABASE_URL`: (Auto-added by Vercel Postgres)
+- `GOOGLE_GENERATIVE_AI_API_KEY`: Your Gemini API key.
+- `NODE_ENV`: `production`
+
+### 5. Initialize Production Database
+To set up the schema in your cloud database:
+1. Temporarily copy the production `DATABASE_URL` from Vercel to your local `.env`.
+2. Run these commands from your computer:
+   ```bash
+   cd backend
+   npx prisma db push
+   npx prisma db seed
+   ```
+
 ## 📄 License
 
 MIT
