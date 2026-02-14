@@ -1,5 +1,4 @@
 import { Context } from 'hono'
-import { streamText } from 'hono/streaming'
 import prisma from '../lib/prisma.js'
 import agentService from '../services/agent.service.js'
 
@@ -18,13 +17,9 @@ export const sendMessage = async (c: Context) => {
 
     const result = await agentService.handleMessage(cid, content)
 
-    c.header('x-conversation-id', cid)
-    c.header('Content-Type', 'text/plain; charset=utf-8')
-    c.header('Transfer-Encoding', 'chunked')
-
-    return streamText(c, async (stream) => {
-        for await (const chunk of result.textStream) {
-            await stream.write(chunk)
+    return result.toTextStreamResponse({
+        headers: {
+            'x-conversation-id': cid,
         }
     })
 }
