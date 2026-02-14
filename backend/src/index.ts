@@ -12,13 +12,34 @@ dotenv.config()
 const app = new Hono()
 
 // Middleware
-app.use('*', logger())
+app.use('*', async (c, next) => {
+    // Polyfill for headers.get if it's missing (happens in some Vercel environments)
+    if (c.req.raw && c.req.raw.headers && typeof c.req.raw.headers.get !== 'function') {
+        const rawHeaders = c.req.raw.headers as any;
+        const headersInstance = new Headers();
+        for (const [key, value] of Object.entries(rawHeaders)) {
+            if (Array.isArray(value)) {
+                value.forEach(v => headersInstance.append(key, v));
+            } else if (typeof value === 'string') {
+                headersInstance.set(key, value);
+            }
+        }
+        // @ts-ignore - overriding readonly property for fix
+        Object.defineProperty(c.req.raw, 'headers', {
+            value: headersInstance,
+            writable: true,
+            configurable: true
+        });
+    }
+    await next()
+})
 app.use('*', cors({
     origin: '*',
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['x-conversation-id'],
 }))
+app.use('*', logger())
 
 import seed from '../prisma/seed.js'
 
@@ -39,8 +60,19 @@ app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISO
 app.route('/api/chat', chatRoutes)
 app.route('/api/agents', agentRoutes)
 
+// 404 Handling
+app.notFound((c) => {
+    return c.json({
+        success: false,
+        message: `Route not found: ${c.req.method} ${c.req.path}`
+    }, 404)
+})
+
 // Error Handling
-app.onError(errorHandler)
+app.onError((err, c) => {
+    console.error(`[Error ${c.req.method} ${c.req.path}]: ${err.message}`)
+    return errorHandler(err, c)
+})
 
 const port = Number(process.env.PORT) || 3000
 
