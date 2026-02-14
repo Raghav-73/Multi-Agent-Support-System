@@ -131,7 +131,13 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/health`);
       const data = await res.json();
-      console.log("Health Check:", data);
+      if (data.success) {
+        console.log("Health Check:", data);
+      } else {
+        alert(
+          "Gemini API key exhausted! Sorry HR, App might not work properly.",
+        );
+      }
     } catch (e) {
       alert(
         "Failed to connect to the backend API. Please check your connection and try again.",
@@ -142,7 +148,6 @@ export default function App() {
 
   useEffect(() => {
     healthCheckApi();
-    alert("Gemini API key exhausted! Sorry HR, App might not work properly.");
     fetchConversations();
   }, []);
 
