@@ -189,43 +189,40 @@ npm run db:setup
 docker-compose down
 ```
 
-## 🚀 Deployment to Vercel
+## 🚀 Deployment
 
-This project is configured for a unified monorepo deployment on **Vercel**.
+This project is configured for a split deployment: **Backend on Vercel** and **Frontend on Netlify**.
 
-### 1. Connect to Vercel
-- Push your code to a GitHub repository.
-- Go to the [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New" → "Project"**.
-- Import your repository.
+### 1. Backend Deployment (Vercel)
+- **Import**: Go to Vercel and import your repository.
+- **Root Directory**: Select the `backend` folder as the Root Directory.
+- **Environment Variables**:
+  - `GOOGLE_GENERATIVE_AI_API_KEY`: Your Gemini API key.
+  - `DATABASE_URL`: (Will be added by Vercel Postgres).
+- **Storage**: Go to the **Storage** tab, create a **Vercel Postgres** database, and connect it to this project.
+- **Build & Development Settings**: Vercel should automatically detect the settings from `package.json` and `vercel.json` inside the `backend` folder.
 
-### 2. Configure Vercel Project
-- **Framework Preset**: Select **Vite** (or leave as Other).
-- **Root Directory**: Keep as `.` (root).
-- **Build Command**: `npm run build`
-- **Output Directory**: `frontend/dist`
-
-### 3. Set Up Vercel Postgres
-Instead of running PostgreSQL locally, use Vercel's managed database:
-1. In your project dashboard, click the **"Storage"** tab.
-2. Select **"Postgres"** and click **"Create"**.
-3. Click **"Connect"** to link it to your project.
-4. This will automatically add the `DATABASE_URL` (and other variables) to your environment.
-
-### 4. Required Environment Variables
-Go to **Settings → Environment Variables** and ensure these are set:
-- `DATABASE_URL`: (Auto-added by Vercel Postgres)
-- `GOOGLE_GENERATIVE_AI_API_KEY`: Your Gemini API key.
-- `NODE_ENV`: `production`
-
-### 5. Initialize Production Database
-To set up the schema in your cloud database:
-1. Temporarily copy the production `DATABASE_URL` from Vercel to your local `.env`.
-2. Run these commands from your computer:
+### 2. Database Initialization
+Once the backend is deployed:
+1. Copy the production `DATABASE_URL` from the Vercel dashboard.
+2. Locally, in your `backend/.env`, temporarily paste that URL.
+3. Run:
    ```bash
    cd backend
    npx prisma db push
    npx prisma db seed
    ```
+
+### 3. Frontend Deployment (Netlify)
+- **Import**: Go to Netlify and import your repository.
+- **Base Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Publish Directory**: `dist`
+- **Environment Variables**:
+  - `VITE_API_URL`: Your Vercel backend URL (e.g., `https://your-backend.vercel.app`). **Important**: Do not add a trailing slash.
+
+### 4. CORS
+The backend is already configured to allow CORS, so the frontend on Netlify will be able to communicate with the backend on Vercel.
 
 ## 📄 License
 
