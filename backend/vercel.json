@@ -2,8 +2,21 @@
     "name": "multi-agent-backend",
     "rewrites": [
         {
+            "source": "/health",
+            "destination": "/api/index"
+        },
+        {
+            "source": "/api/health",
+            "destination": "/api/index"
+        },
+        {
             "source": "/(.*)",
             "destination": "/api/index"
         }
-    ]
+    ],
+    "functions": {
+        "api/index.ts": {
+            "runtime": "nodejs18.x"
+        }
+    }
 }

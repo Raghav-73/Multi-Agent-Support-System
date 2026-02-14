@@ -1,5 +1,5 @@
 import { handle } from 'hono/vercel'
-import app from '../backend/src/index.js'
+import app from '../backend/dist/src/index.js'
 
 export const config = {
     runtime: 'nodejs18.x'
