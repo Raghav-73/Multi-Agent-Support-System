@@ -13,7 +13,12 @@ const app = new Hono()
 
 // Middleware
 app.use('*', logger())
-app.use('*', cors())
+app.use('*', cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+    exposeHeaders: ['x-conversation-id'], // CRITICAL: Allows frontend to read custom headers
+}))
 
 // Health check
 app.get('/', (c) => c.text('Hello World'))

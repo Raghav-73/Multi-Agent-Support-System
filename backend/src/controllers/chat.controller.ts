@@ -17,7 +17,7 @@ export const sendMessage = async (c: Context) => {
 
     const result = await agentService.handleMessage(cid, content)
 
-    return result.toUIMessageStreamResponse({
+    return result.toTextStreamResponse({
         headers: {
             'x-conversation-id': cid,
         }

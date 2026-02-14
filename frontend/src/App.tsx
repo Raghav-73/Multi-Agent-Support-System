@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useChat } from "@ai-sdk/react";
 import {
   MessageSquare,
   Plus,
@@ -27,40 +26,80 @@ interface Conversation {
   updatedAt: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://raghav-mas.vercel.app";
+const API_BASE_URL = "https://raghav-mas.vercel.app";
 
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, setMessages, status } = useChat({
-    api: `${API_BASE_URL}/api/chat`,
-    fetch: async (url: any, options: any) => {
-      // Force the use of the full URL if useChat tries to use a relative one
-      const targetUrl = url.toString().startsWith("/")
-        ? `${API_BASE_URL}${url}`
-        : url;
-      return fetch(targetUrl, options);
-    },
-    onResponse: (response: any) => {
-      const newId = response.headers.get("x-conversation-id");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const sendMessage = async (content: string) => {
+    if (!content.trim()) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          conversationId: currentId,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to send message");
+
+      const newId = res.headers.get("x-conversation-id");
       if (newId && !currentId) {
         setCurrentId(newId);
         fetchConversations();
       }
-    },
-    onFinish: async () => {
-      fetchConversations();
-      if (currentId) {
-        await fetchMessages(currentId);
-      }
-    },
-  });
 
-  // Create isLoading derived state for existing UI components
-  const isLoading = status === "streaming" || status === "submitted";
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = "";
+      const assistantId = Date.now().toString() + "-ai";
+
+      // Add placeholder for assistant message
+      setMessages(prev => [...prev, {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        agentType: "ROUTING" // Default or optimistic
+      }]);
+
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        assistantContent += chunk;
+        setMessages(prev =>
+          prev.map(m => m.id === assistantId ? { ...m, content: assistantContent } : m)
+        );
+      }
+
+      fetchConversations();
+      if (currentId || newId) {
+        await fetchMessages((currentId || newId) as string);
+      }
+    } catch (e) {
+      console.error("Failed to send message", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const [input, setInput] = useState("");
 
@@ -74,14 +113,11 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
-    await sendMessage({ role: "user", content: input } as any, {
-      body: {
-        conversationId: currentId,
-      },
-    });
+    const val = input;
     setInput("");
+    await sendMessage(val);
   };
 
   useEffect(() => {
