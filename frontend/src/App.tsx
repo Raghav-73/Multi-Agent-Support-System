@@ -36,6 +36,13 @@ export default function App() {
 
   const { messages, sendMessage, setMessages, status } = useChat({
     api: `${API_BASE_URL}/api/chat`,
+    fetch: async (url: any, options: any) => {
+      // Force the use of the full URL if useChat tries to use a relative one
+      const targetUrl = url.toString().startsWith("/")
+        ? `${API_BASE_URL}${url}`
+        : url;
+      return fetch(targetUrl, options);
+    },
     onResponse: (response: any) => {
       const newId = response.headers.get("x-conversation-id");
 
@@ -50,13 +57,7 @@ export default function App() {
         await fetchMessages(currentId);
       }
     },
-  } as any);
-
-  // const { messages, sendMessage, setMessages, status } = useChat({
-  //     onFinish: () => {
-  //         fetchConversations()
-  //     }
-  // })
+  });
 
   // Create isLoading derived state for existing UI components
   const isLoading = status === "streaming" || status === "submitted";
