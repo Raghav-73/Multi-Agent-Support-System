@@ -142,6 +142,7 @@ export default function App() {
 
   useEffect(() => {
     healthCheckApi();
+    alert("Gemini API key exhausted! Sorry HR, App might not work properly.");
     fetchConversations();
   }, []);
 
