@@ -26,7 +26,9 @@ interface Conversation {
   updatedAt: string;
 }
 
-const API_BASE_URL = import.meta.env.DEV ? "http://localhost:3000" : "https://raghav-mas.vercel.app";
+const API_BASE_URL = import.meta.env.DEV
+  ? "http://localhost:3000"
+  : "https://raghav-mas.vercel.app";
 
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -42,10 +44,10 @@ export default function App() {
     const userMessage = {
       id: Date.now().toString(),
       role: "user",
-      content
+      content,
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
     try {
@@ -72,12 +74,15 @@ export default function App() {
       const assistantId = Date.now().toString() + "-ai";
 
       // Add placeholder for assistant message
-      setMessages(prev => [...prev, {
-        id: assistantId,
-        role: "assistant",
-        content: "",
-        agentType: "ROUTING" // Default or optimistic
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: "assistant",
+          content: "",
+          agentType: "ROUTING", // Default or optimistic
+        },
+      ]);
 
       while (reader) {
         const { done, value } = await reader.read();
@@ -85,8 +90,10 @@ export default function App() {
 
         const chunk = decoder.decode(value);
         assistantContent += chunk;
-        setMessages(prev =>
-          prev.map(m => m.id === assistantId ? { ...m, content: assistantContent } : m)
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: assistantContent } : m,
+          ),
         );
       }
 
@@ -120,7 +127,21 @@ export default function App() {
     await sendMessage(val);
   };
 
+  const healthCheckApi = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/health`);
+      const data = await res.json();
+      console.log("Health Check:", data);
+    } catch (e) {
+      alert(
+        "Failed to connect to the backend API. Please check your connection and try again.",
+      );
+      console.error("Health check failed", e);
+    }
+  };
+
   useEffect(() => {
+    healthCheckApi();
     fetchConversations();
   }, []);
 
@@ -166,7 +187,9 @@ export default function App() {
 
   const deleteConversation = async (id: string) => {
     try {
-      await fetch(`${API_BASE_URL}/api/chat/conversations/${id}`, { method: "DELETE" });
+      await fetch(`${API_BASE_URL}/api/chat/conversations/${id}`, {
+        method: "DELETE",
+      });
       if (currentId === id) setCurrentId(null);
       fetchConversations();
     } catch (e) {
@@ -292,7 +315,7 @@ export default function App() {
             <h2 style={{ fontSize: "1.125rem", fontWeight: 600 }}>
               {currentId
                 ? conversations.find((c) => c.id === currentId)?.title ||
-                "Active Session"
+                  "Active Session"
                 : "New Session"}
             </h2>
             <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>

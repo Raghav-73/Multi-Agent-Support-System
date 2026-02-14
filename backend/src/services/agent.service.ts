@@ -43,9 +43,11 @@ export class AgentService {
         tools = {
           getOrderDetails: tool({
             description: "Fetch details of an order by its ID",
-            inputSchema: zodSchema(z.object({
-              orderId: z.string().optional().describe("The ID of the order"),
-            })) as any,
+            inputSchema: zodSchema(
+              z.object({
+                orderId: z.string().optional().describe("The ID of the order"),
+              }),
+            ) as any,
             execute: (async ({ orderId }: { orderId?: string }) => {
               const finalOrderId = orderId || extractedOrderId;
               console.log("Using orderId for getOrderDetails:", finalOrderId);
@@ -60,15 +62,14 @@ export class AgentService {
           getDeliveryStatus: tool({
             description:
               "Check the delivery status and tracking information for an order",
-            inputSchema: zodSchema(z.object({
-              orderId: z.string().optional().describe("The ID of the order"),
-            })) as any,
+            inputSchema: zodSchema(
+              z.object({
+                orderId: z.string().optional().describe("The ID of the order"),
+              }),
+            ) as any,
             execute: (async ({ orderId }: { orderId?: string }) => {
               const finalOrderId = orderId || extractedOrderId;
-              console.log(
-                "Using orderId for getDeliveryStatus:",
-                finalOrderId,
-              );
+              console.log("Using orderId for getDeliveryStatus:", finalOrderId);
 
               if (!finalOrderId) {
                 return "Please provide a valid order ID like ORD-101.";
@@ -101,7 +102,7 @@ Estimated Arrival: ${order.estimatedArrival ?? "Not available"}
     }
 
     return streamText({
-      model: google("gemini-1.5-flash"),
+      model: google("gemini-2.0-flash"),
       system: `You are a helpful customer support agent for a multi-agent support system.
       Your current specialized role is: ${intent}.
       ${extractedOrderId ? `Current context: Help the user with Order ID: ${extractedOrderId}` : ""}
