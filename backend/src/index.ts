@@ -40,7 +40,8 @@ app.use("*", async (c, next) => {
 app.use(
   "*",
   cors({
-    origin: ["https://raghav-mas.netlify.app", "http://localhost:5173"],
+    // origin: ["https://raghav-mas.netlify.app", "http://localhost:5173"],
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["x-conversation-id"],
