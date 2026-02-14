@@ -1,10 +1,6 @@
 import { Context } from 'hono'
 import prisma from '../lib/prisma.js'
 import agentService from '../services/agent.service.js'
-export const config = {
-    runtime: "edge",
-};
-
 export const sendMessage = async (c: Context) => {
     const { messages, conversationId } = await c.req.json()
     const lastMessage = messages[messages.length - 1]
