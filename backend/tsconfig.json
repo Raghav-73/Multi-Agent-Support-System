@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "strict": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
@@ -16,7 +16,10 @@
         ]
     },
     "include": [
-        "src/**/*",
-        "prisma/seed.ts"
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
     ]
 }

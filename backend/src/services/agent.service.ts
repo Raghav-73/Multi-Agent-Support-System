@@ -5,7 +5,7 @@ import prisma from "../lib/prisma.js";
 import z from "zod";
 
 export class AgentService {
-  async processMessage(
+  async handleMessage(
     conversationId: string,
     message: string,
     extractedOrderId?: string,
@@ -133,3 +133,6 @@ Estimated Arrival: ${order.estimatedArrival ?? "Not available"}
     });
   }
 }
+
+const agentService = new AgentService();
+export default agentService;
