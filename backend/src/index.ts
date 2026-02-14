@@ -11,20 +11,15 @@ dotenv.config();
 
 const app = new Hono();
 
-// Middleware
+// middleware
 app.use(
   "*",
   cors({
-    origin: (origin: any) => {
-      const allowed = [
-        "https://raghav-mas.netlify.app",
-        "http://localhost:5173",
-      ];
-      return allowed.includes(origin ?? "") ? origin : null;
-    },
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: ["*"],
     exposeHeaders: ["x-conversation-id"],
+    maxAge: 86400,
   }),
 );
 
