@@ -17,7 +17,7 @@ app.use('*', cors({
     origin: '*',
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
-    exposeHeaders: ['x-conversation-id'], // CRITICAL: Allows frontend to read custom headers
+    exposeHeaders: ['x-conversation-id'],
 }))
 
 import seed from '../prisma/seed.js'
