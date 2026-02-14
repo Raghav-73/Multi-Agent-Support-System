@@ -49,7 +49,7 @@ app.use(
 app.use("*", logger());
 
 app.options("*", (c) => {
-  return c.text("", 204);
+  return c.text("", 204 as any);
 });
 
 import seed from "../prisma/seed.js";
