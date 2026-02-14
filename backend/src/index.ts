@@ -15,11 +15,14 @@ const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin: (origin) => {
+      return origin || "*";
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["*"],
+    allowHeaders: ["Content-Type", "Authorization", "Accept", "x-conversation-id"],
     exposeHeaders: ["x-conversation-id"],
     maxAge: 86400,
+    credentials: true,
   }),
 );
 

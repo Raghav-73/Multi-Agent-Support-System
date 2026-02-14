@@ -15,6 +15,17 @@ export const errorHandler = async (err: Error, c: Context) => {
     }
 
     const isDevelopment = process.env.NODE_ENV === 'development';
+    const origin = c.req.header("Origin");
+
+    if (origin) {
+        c.header("Access-Control-Allow-Origin", origin);
+        c.header("Access-Control-Allow-Credentials", "true");
+    } else {
+        c.header("Access-Control-Allow-Origin", "*");
+    }
+
+    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, x-conversation-id");
 
     return c.json(
         {
