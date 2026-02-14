@@ -16,7 +16,9 @@ app.use('*', logger())
 app.use('*', cors())
 
 // Health check
+app.get('/', (c) => c.text('Hello World'))
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 
 // Routes
 app.route('/api/chat', chatRoutes)
