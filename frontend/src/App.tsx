@@ -27,7 +27,7 @@ interface Conversation {
   updatedAt: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://raghav-mas.vercel.app";
 console.log("API_BASE_URL:", API_BASE_URL);
 
 export default function App() {
