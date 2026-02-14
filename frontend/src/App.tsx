@@ -27,7 +27,7 @@ interface Conversation {
   updatedAt: string;
 }
 
-const API_BASE_URL = "https://raghav-mas.vercel.app"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://raghav-mas.vercel.app";
 
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
