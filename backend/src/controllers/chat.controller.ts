@@ -1,6 +1,9 @@
 import { Context } from 'hono'
 import prisma from '../lib/prisma.js'
 import agentService from '../services/agent.service.js'
+export const config = {
+    runtime: "edge",
+};
 
 export const sendMessage = async (c: Context) => {
     const { messages, conversationId } = await c.req.json()
@@ -8,6 +11,7 @@ export const sendMessage = async (c: Context) => {
     const content = lastMessage.content
 
     let cid = conversationId
+
     if (!cid) {
         const conversation = await prisma.conversation.create({
             data: { title: content.substring(0, 50) }
@@ -17,11 +21,13 @@ export const sendMessage = async (c: Context) => {
 
     const result = await agentService.handleMessage(cid, content)
 
-    return result.toTextStreamResponse({
+    const response = result.toTextStreamResponse({
         headers: {
             'x-conversation-id': cid,
-        }
+        },
     })
+
+    return response
 }
 
 export const getConversation = async (c: Context) => {
